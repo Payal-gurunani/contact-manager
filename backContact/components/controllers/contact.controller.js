@@ -31,4 +31,16 @@ const createContact = asyncHandler(async (req,res)=>{
        new ApiResponse(200 ,newContact,"contact created Successfully")
     )
 })
-export {createContact}
+ const getAllContact = asyncHandler(async (req , res,next) =>{
+    
+        const allContacts =  await Contact.find({user:req.user._id})
+        if(!allContacts || allContacts.length === 0){
+            throw ApiError(404,"No contacts available")
+        }
+    return res.status(200).json(
+        new ApiResponse(200,"Contact get successfully",allContacts)
+    )
+    
+ })
+
+export {createContact,getAllContact}
