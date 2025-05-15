@@ -2,6 +2,7 @@ import { ApiError } from "../utils/ApiError.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { Contact } from "../models/contact.model.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
+import mongoose from "mongoose";
 
 const createContact = asyncHandler(async (req,res)=>{
     const {contactName , email , phone } = req.body;
@@ -42,5 +43,42 @@ const createContact = asyncHandler(async (req,res)=>{
     )
     
  })
+const updateContact = asyncHandler(async (req , res) =>{
+    const {id} = req.params;
+    console.log("Id requested from update" , id);
 
-export {createContact,getAllContact}
+    if(!mongoose.Types.ObjectId.isValid(id)){
+        throw new ApiError(400 , "Invalid Id ")
+    }
+    const update = req.body;
+    const updateContact = await Contact.findByIdAndUpdate(
+        { _id: id, user: req.user._id },
+        update,
+        {new:true, runValidators:true}
+)
+
+    if(!updateContact){
+         throw new ApiError(404 , "Contact not found")
+    }
+    return res.status(200).json(
+        new ApiResponse(200 , "Your data is update",updateContact)
+    )
+})
+
+const deleteContact = asyncHandler(async (req,res)=>{
+    const {id} = req.params;
+    if(!mongoose.Types.ObjectId.isValid(id)){
+        throw new ApiError(400 , "Invalid Id ")
+    }
+
+    const deletedContact = await Contact.findOneAndDelete( { _id: id, user: req.user._id }
+    )
+
+    if(!deletedContact){
+        throw new ApiError(404,"Contact not found")
+    }
+     return res.status(200).json(
+        new ApiResponse(200 ,deletedContact, "Your data is deleted")
+    )
+})
+export {createContact,getAllContact,updateContact ,deleteContact}
