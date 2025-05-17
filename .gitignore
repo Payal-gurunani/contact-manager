@@ -76,6 +76,7 @@ web_modules/
 
 # dotenv environment variables file
 backContact/.env
+frontContact/.env
 .env.test
 .env.production
 
