@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Box,
@@ -12,11 +12,16 @@ import {
 } from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import { Link } from 'react-router-dom';
+import { apiRequest } from '../config/apiRequest';
+import { Endpoints } from '../config/EndPoints';
 
 const Register = () => {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
   const [formData, setFormData] = useState({
     username: '',
+    name: '',
     email: '',
     password: '',
   });
@@ -30,11 +35,39 @@ const Register = () => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Call your backend API here
-    console.log('Register data:', formData);
-    navigate('/login');
+    setError('');
+    setLoading(true);
+
+    // Basic frontend validation
+    if (!formData.email.includes('@')) {
+      setError('Please enter a valid email address.');
+      setLoading(false);
+      return;
+    }
+
+    if (formData.password.length < 6) {
+      setError('Password must be at least 6 characters.');
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const response = await apiRequest(Endpoints.REGISTER, formData);
+      console.log(response);
+      
+      if (response.success) {
+        alert('Registration successful! Please login.');
+        navigate('/login');
+      } else {
+        setError('Registration failed. Please try again.');
+      }
+    } catch (err) {
+      setError(err.message || 'Something went wrong.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -43,6 +76,12 @@ const Register = () => {
         <Typography variant="h4" gutterBottom align="center">
           Create Account
         </Typography>
+
+        {error && (
+          <Typography color="error" align="center" mt={2}>
+            {error}
+          </Typography>
+        )}
 
         <form onSubmit={handleSubmit}>
           <Box mb={3}>
@@ -55,7 +94,17 @@ const Register = () => {
               required
             />
           </Box>
+          <Box mb={3}>
+            <TextField
+              label="Name"
+              name="name"
+              fullWidth
+              value={formData.name}
+              onChange={handleChange}
+              required
+            />
 
+          </Box>
           <Box mb={3}>
             <TextField
               label="Email"
@@ -96,6 +145,7 @@ const Register = () => {
             type="submit"
             fullWidth
             variant="contained"
+            disabled={loading}
             sx={{
               mt: 2,
               py: 1.5,
@@ -104,7 +154,7 @@ const Register = () => {
               fontSize: '1rem',
             }}
           >
-            Register
+            {loading ? 'Registering...' : 'Register'}
           </Button>
 
           <Typography mt={3} textAlign="center">

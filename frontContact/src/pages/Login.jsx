@@ -1,20 +1,33 @@
 import { useState } from 'react'
 import { TextField, Button, Paper, Typography } from '@mui/material'
 import { useNavigate } from 'react-router-dom'
-
+import { apiRequest } from '../config/apiRequest'
+import { Endpoints } from '../config/EndPoints'
 function Login() {
   const [email, setEmail] = useState('')
+  const [loading, setLoading] = useState(false)
   const [password, setPassword] = useState('')
   const navigate = useNavigate()
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
-
+    setLoading(true)
     // Placeholder for login logic (API call)
-    console.log('Logging in with', { email, password })
+    const response = await apiRequest(Endpoints.LOGIN, { email, password })
+    
+    console.log('Logging in with', response)
+localStorage.setItem('token', response.message.token)
+console.log("from login",response.message.token);
 
     // On successful login, redirect to home or contacts
-    navigate('/contact')
+   console.log('API response:', response);
+if (response.message.token) {
+  localStorage.setItem('token', response.message.token);
+  navigate('/contact');
+} else {
+  alert('Login failed: no token returned');
+}
+
   }
 
   return (
@@ -40,9 +53,10 @@ function Login() {
             onChange={(e) => setPassword(e.target.value)}
             required
           />
-          <Button variant="contained" color="primary" type="submit">
-            Log In
+          <Button variant="contained" color="primary" type="submit" disabled={loading}>
+            {loading ? "Logging in..." : "Log In"}
           </Button>
+
         </form>
         <Typography variant="body2" className="mt-4 text-center">
           Don’t have an account?{' '}
