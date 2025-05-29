@@ -7,6 +7,7 @@ function Login() {
   const [email, setEmail] = useState('')
   const [loading, setLoading] = useState(false)
   const [password, setPassword] = useState('')
+  
   const navigate = useNavigate()
 
   const handleSubmit = async (e) => {
@@ -14,13 +15,10 @@ function Login() {
     setLoading(true)
     // Placeholder for login logic (API call)
     const response = await apiRequest(Endpoints.LOGIN, { email, password })
-    
-    console.log('Logging in with', response)
 localStorage.setItem('token', response.message.token)
-console.log("from login",response.message.token);
 
     // On successful login, redirect to home or contacts
-   console.log('API response:', response);
+   
 if (response.message.token) {
   localStorage.setItem('token', response.message.token);
   navigate('/contact');

@@ -65,11 +65,6 @@ function App() {
    </Route>
 </Routes> 
     </div>
-
-
-
-
-  
 </ThemeProvider>
   )
 }

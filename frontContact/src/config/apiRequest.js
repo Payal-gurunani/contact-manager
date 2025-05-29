@@ -1,7 +1,5 @@
 export const apiRequest = async (endpoint, data = null, headers = {}) => {
   const token = localStorage.getItem("token");
-console.log(token, "from api");
-
   const options = {
     method: endpoint.method,
     headers: {
@@ -20,9 +18,8 @@ console.log(token, "from api");
 
     const contentType = response.headers.get("content-type");
 
-    // If response is not JSON, get text (maybe an HTML error page)
     if (!contentType || !contentType.includes("application/json")) {
-      const text = await response;
+      const text = await response.text(); // ✅ FIXED
       throw new Error(`Server returned non-JSON response: ${text}`);
     }
 

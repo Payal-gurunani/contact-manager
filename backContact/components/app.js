@@ -10,8 +10,21 @@ app.use(cors({
   credentials: true                // If you're using cookies or auth headers
 }));
 
-app.use(express.json({limit:"16kb"}))
+app.use(express.json())
 app.use(express.urlencoded({extended:true}))
 app.use("/api/v1/users",userRoutes)
 app.use("/api/v1/contacts",contactRoutes)
+// Custom error handler (must be placed AFTER all routes)
+app.use((err, req, res, next) => {
+  console.error(err); // Optional: log full error
+
+  const statusCode = err.statusCode || 500;
+  const message = err.message || 'Internal Server Error';
+
+  res.status(statusCode).json({
+    success: false,
+    message,
+  });
+});
+
 export {app}

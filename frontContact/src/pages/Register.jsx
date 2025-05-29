@@ -61,14 +61,19 @@ const Register = () => {
         alert('Registration successful! Please login.');
         navigate('/login');
       } else {
-        setError('Registration failed. Please try again.');
+        setError(response.message || 'Registration failed. Please try again.');
       }
     } catch (err) {
+    // Handle structured error response from backend
+    if (err.response && err.response.data && err.response.data.message) {
+      setError(err.response.data.message);
+    } else {
       setError(err.message || 'Something went wrong.');
-    } finally {
-      setLoading(false);
     }
-  };
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <Container maxWidth="sm">
